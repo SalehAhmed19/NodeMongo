@@ -1,16 +1,18 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const todoHandler = require("./routeHandler/todoHandler");
+const userController = require("./routeControllers/userController");
+const todoController = require("./routeControllers/todoController");
 
 const PORT = process.env.PORT || 4000;
 
 // app initialization
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // db connection
 mongoose
-  .connect("mongodb://localhost/todos")
+  .connect("mongodb://localhost/users")
   .then(() => {
     console.log("Connection succeeded");
   })
@@ -19,14 +21,8 @@ mongoose
   });
 
 // routes
-app.use("/todo", todoHandler);
-// default error handler
-const errorHandler = (err, req, res, next) => {
-  if (res.headersSent) {
-    return next(err);
-  }
-  res.status(500).json({ error: err });
-};
+app.use("/api/users", userController);
+app.use("/api/todos", todoController);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
@@ -35,3 +31,9 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Listenig on port ${PORT}`);
 });
+
+// {
+//     "title":"Todo 1",
+//     "description":"New Todo 1",
+//     "status":"active"
+// }
